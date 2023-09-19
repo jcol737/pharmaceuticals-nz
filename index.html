@@ -17,7 +17,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/chroma-js/2.4.2/chroma.min.js"
         integrity="sha512-zInFF17qBFVvvvFpIfeBzo7Tj7+rQxLeTJDmbxjBz5/zIr89YVbTNelNhdTT+/DCrxoVzBeUPVFJsczKbB7sew=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.3.1/leaflet.css"
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.3.1/leaflet.css"
         integrity="sha256-iYUgmrapfDGvBrePJPrMWQZDcObdAcStKBpjP3Az+3s=" crossorigin="anonymous" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.3.1/leaflet.js"
         integrity="sha256-CNm+7c26DTTCGRQkM9vp7aP85kHFMqs9MhPEuytF+fQ=" crossorigin="anonymous"></script>
@@ -33,33 +33,35 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    
+
 
     <style>
         #title {
-                position: absolute;
-                top: 30px;
-                left: 0;
-                right: 0;
-                margin: auto;
-                z-index: 1000;
-                width: 50%;
-                text-align: center;
-                color: white;
-                border-radius: 5px;
-                padding: 10px;
-                background-color: rgba(0, 0, 0, 0.8);
-                font-family: Arial, Helvetica, sans-serif;
-                text-shadow: 2px 2px #000000;
-                font-weight: normal;
-                font-size: 1rem;
-            }
-        body, #map {
-                width: 100%;
-                height: 100%;
-                margin: 0;
-                autopadding: 0
-            }
+            position: absolute;
+            top: 30px;
+            left: 0;
+            right: 0;
+            margin: auto;
+            z-index: 1000;
+            width: 50%;
+            text-align: center;
+            color: white;
+            border-radius: 5px;
+            padding: 10px;
+            background-color: rgba(0, 0, 0, 0.8);
+            font-family: Arial, Helvetica, sans-serif;
+            text-shadow: 2px 2px #000000;
+            font-weight: normal;
+            font-size: 1rem;
+        }
+
+        body,
+        #map {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            autopadding: 0
+        }
     </style>
 
 </head>
@@ -81,171 +83,183 @@
 
     <script>
 
-    var map = L.map('map', {
-                    zoom: 6,
-                    center: [-41, 172]
-                });
+        var map = L.map('map', {
+            zoom: 6,
+            center: [-41, 172]
+        });
 
-    //L.tileLayer.provider('CartoDB.PositronNoLabels').addTo(map);
-    
-    var bounds = map.getBounds();
-    bounds._northEast.lat += 10;
-    bounds._northEast.lng += 10;
-    bounds._southWest.lat -= 10;
-    bounds._southWest.lng -= 10;
-    map.setMaxBounds(bounds);
+        //L.tileLayer.provider('CartoDB.PositronNoLabels').addTo(map);
 
-    var baseMaps = {
-      "OSM": L.tileLayer.provider("OpenStreetMap.Mapnik"),
-      "OSM Grayscale": L.tileLayer.provider("OpenStreetMap.BlackAndWhite"),
-      "CartoDB Positron": L.tileLayer.provider('CartoDB.PositronNoLabels').addTo(map),
-      "CartoDB Dark Matter": L.tileLayer.provider("CartoDB.DarkMatter"),
-      "ESRI WorldImagery": L.tileLayer.provider("Esri.WorldImagery"),
-      "Google Hybrid": L.tileLayer('http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}', {
-        maxZoom: 20,
-        subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
-      }),
-      "Wikimedia": L.tileLayer.provider("Wikimedia")
-    }
+        var bounds = map.getBounds();
+        bounds._northEast.lat += 10;
+        bounds._northEast.lng += 10;
+        bounds._southWest.lat -= 10;
+        bounds._southWest.lng -= 10;
+        map.setMaxBounds(bounds);
 
-    map.createPane('labels');
-    map.getPane('labels').style.zIndex = 625;
-    map.getPane('labels').style.pointerEvents = 'none';
-    var labels = L.tileLayer.provider("Stamen.TonerLabels", {
-      pane: "labels",
-      interactive: false,
-      opacity: .8,
-    });
-
-    map.createPane('whitelabels');
-    map.getPane('whitelabels').style.zIndex = 625;
-    map.getPane('whitelabels').style.pointerEvents = 'none';
-    map.getPane('whitelabels').style.filter = 'invert(100%)';
-    var whitelabels = L.tileLayer.provider("Stamen.TonerLabels", {
-      pane: "whitelabels",
-      interactive: false,
-      opacity: .8,
-    });
-
-    //var DHB2012_Layer = L.layerGroup().addTo(map);
-
-    var typeControl = L.control({position: 'topright'});
-    typeControl.onAdd = function(map) {
-        return document.getElementById('type-filter');
-    };
-    typeControl.addTo(map);
-    
-    var groupingControl = L.control({position: 'topright'});
-    groupingControl.onAdd = function(map) {
-        return document.getElementById('grouping-filter');
-    };
-    groupingControl.addTo(map);
-
-    var yearControl = L.control({position: 'topright'});
-    yearControl.onAdd = function(map) {
-        return document.getElementById('year-filter');
-    };
-    yearControl.addTo(map);
-
-
-    var csvData;
-    Papa.parse('Te_Whatu_Ora_data/Data_ByTG3.csv', {
-        download: true,
-        header: true,
-        complete: function(results) {
-            csvData = results.data;
-            document.getElementById('type-filter').style.display = 'block';
-            document.getElementById('grouping-filter').style.display = 'block';
-            document.getElementById('year-filter').style.display = 'block';
+        var baseMaps = {
+            "OSM": L.tileLayer.provider("OpenStreetMap.Mapnik"),
+            "OSM Grayscale": L.tileLayer.provider("OpenStreetMap.BlackAndWhite"),
+            "CartoDB Positron": L.tileLayer.provider('CartoDB.PositronNoLabels').addTo(map),
+            "CartoDB Dark Matter": L.tileLayer.provider("CartoDB.DarkMatter"),
+            "ESRI WorldImagery": L.tileLayer.provider("Esri.WorldImagery"),
+            "Google Hybrid": L.tileLayer('http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}', {
+                maxZoom: 20,
+                subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
+            }),
+            "Wikimedia": L.tileLayer.provider("Wikimedia")
         }
-    })
 
-    //var typeSelect = document.getElementById('type-select');
-    //var groupingSelect = document.getElementById('grouping-select');
-    //var yearSelect = document.getElementById('year-select');
+        map.createPane('labels');
+        map.getPane('labels').style.zIndex = 625;
+        map.getPane('labels').style.pointerEvents = 'none';
+        var labels = L.tileLayer.provider("Stamen.TonerLabels", {
+            pane: "labels",
+            interactive: false,
+            opacity: .8,
+        });
 
-    var types = [...new Set(csvData.map(row => row.Type))];
-    var groupings = [...new Set(csvData.map(row => row.TherapeuticGrp3
-))];
-    var years = [...new Set(csvData.map(row => row.YearDisp))];
+        map.createPane('whitelabels');
+        map.getPane('whitelabels').style.zIndex = 625;
+        map.getPane('whitelabels').style.pointerEvents = 'none';
+        map.getPane('whitelabels').style.filter = 'invert(100%)';
+        var whitelabels = L.tileLayer.provider("Stamen.TonerLabels", {
+            pane: "whitelabels",
+            interactive: false,
+            opacity: .8,
+        });
 
-    types.forEach(function(type) {
-        var opt = document.createElement('option');
-        opt.value = type;
-        opt.innerHTML = type;
-        typeSelect.appendChild(opt);
-    });
 
-    groupings.forEach(function(grouping) {
-        var opt = document.createElement('option');
-        opt.value = grouping;
-        opt.innerHTML = grouping;
-        groupingSelect.appendChild(opt);
-    });
+        var overlays = {
+            "City labels": labels,
+            "City labels (white)": whitelabels,
+        }
 
-    years.forEach(function(year) {
-        var opt = document.createElement('option');
-        opt.value = year;
-        opt.innerHTML = year;
-        yearSelect.appendChild(opt);
-    });
+        L.control.layers(baseMaps, overlays).addTo(map);
 
-    var overlays = {
-      //"DHB2012_Layer": DHB2012_Layer,
-      "City labels": labels,
-      "City labels (white)": whitelabels,
-    }
+        // add typerhead or autocomplete so search option
 
-    L.control.layers(baseMaps, overlays).addTo(map);
-
-    //$.getJSON('NZ_DHB2012.geojson', function(data) {
-    //    L.geoJSON(data, {
-    //        onEachFeature: function(feature, layer) {
-    //            var match = csvData.find(function(row) {
-    //                return row.DHB === feature.properties.DHB12;
-    //            });
-    //            if (match) {
-    //                feature.properties.csvData = match;
-    //            }
-    //        }
-    //    }).addTo(map); })
-
-    // or simply
-    //$.getJSON('NZ_DHB2012.geojson', function(data) {
-    //    L.geoJSON(data).addTo(map); })
+        var typeControl = L.control({position: 'topright'});
+        typeControl.onAdd = function(map) {
+           return document.getElementById('type-filter');
+        };
+        typeControl.addTo(map);
         
-    document.getElementById('type-select').addEventListener('change', updateMap);
-    document.getElementById('grouping-select').addEventListener('change', updateMap);
-    document.getElementById('year-select').addEventListener('change', updateMap);
+        var groupingControl = L.control({position: 'topright'});
+        groupingControl.onAdd = function(map) {
+           return document.getElementById('grouping-filter');
+        };
+        groupingControl.addTo(map);
+        
+        var yearControl = L.control({position: 'topright'});
+        yearControl.onAdd = function(map) {
+           return document.getElementById('year-filter');
+        };
+        yearControl.addTo(map);
 
-    function updateMap() {
-        var selectedType = document.getElementById('type-select').value;
-        var selectedTherapeuticGrp3 = document.getElementById('grouping-select').value;
-        var selectedYear = document.getElementById('year-select').value;
 
-        // Filter the CSV data based on the selected type and grouping
-        var filteredData = csvData.filter(row => row.Type === selectedType && row.TherapeuticGrp3 ===  selectedTherapeuticGrp3 && row.YearDisp == selectedYear);
-
-        // Remove the old GeoJSON layer
-        map.removeLayer(geojsonLayer);
-
-        // Add a new GeoJSON layer with the selected style
-        geojsonLayer = $.getJSON('NZ_DHB2012.geojson', function(data) {
-            L.geoJSON(data, {
-            style: function(feature) {
-                var match = filteredData.find(row => row.DHB === feature.properties.DHB2012);
-                var color = match ? match.NumDisps : '#ffffff'; // Replace 'Value' with the    property that you're using to set the color of each polygon
-                return {color: color};
+        // create function, then run within another
+        // populate filter with options
+        function populate_filter(filterID, options) {
+            for (var option of options) {
+                $("#" + filterID).append(`<option>${option}</option>`)
             }
-        }).addTo(map);})
-}
+        }
 
 
-    
+
+        var csvData;
+        Papa.parse('Te_Whatu_Ora_data/Data_ByTG3.csv', {
+            download: true,
+            header: true,
+            skipEmptyLines: true,
+            complete: function (results) {
+                csvData = results.data;
+                document.getElementById('type-filter').style.display = 'block';
+                document.getElementById('grouping-filter').style.display = 'block';
+                document.getElementById('year-filter').style.display = 'block';
+
+                var types = [...new Set(csvData.map(row => row.Type))];
+                var groupings = [...new Set(csvData.map(row => row.TherapeuticGrp3
+                ))];
+                var years = [...new Set(csvData.map(row => row.YearDisp))];
+                console.log(types, groupings, years)
+                console.log(results) // print in the console
+
+                populate_filter('type-select', types)
+                populate_filter('grouping-select', groupings)
+                populate_filter('year-select', years)
+
+                updateMap()
+            }
+        })
+
+
+        //$.getJSON('NZ_DHB2012.geojson', function(data) {
+        //    L.geoJSON(data, {
+        //        onEachFeature: function(feature, layer) {
+        //            var match = csvData.find(function(row) {
+        //                return row.DHB === feature.properties.DHB12;
+        //            });
+        //            if (match) {
+        //                feature.properties.csvData = match;
+        //            }
+        //        }
+        //    }).addTo(map); })
+
+        // or simply
+        //$.getJSON('NZ_DHB2012.geojson', function(data) {
+        //    L.geoJSON(data).addTo(map); })
+
+        $('#type-select').change(updateMap) //calling jquery
+        $('#grouping-select').change(updateMap)
+        $('#year-select').change(updateMap)
+
+        geojsonLayer = null
+        
+        function updateMap() {
+            var selectedType = document.getElementById('type-select').value;
+            var selectedTherapeuticGrp3 = document.getElementById('grouping-select').value;
+            var selectedYear = document.getElementById('year-select').value;
+
+            // Filter the CSV data based on the selected type and grouping
+            var filteredData = csvData.filter(row => row.Type === selectedType && row.TherapeuticGrp3 === selectedTherapeuticGrp3 && row.YearDisp == selectedYear);
+            console.log(filteredData)
+
+            var NumDisps = filteredData.map(row => row.NumDisps)
+            var min = Math.min(...NumDisps)
+            var max = Math.max(...NumDisps)
+            console.log(min, max)
+
+            // colours
+            var cmap = chroma.scale('Spectral').domain([min, max])
+
+            // Remove the old GeoJSON layer
+            if (geojsonLayer) map.removeLayer(geojsonLayer)
+            //if (map.removeLayer(geojsonLayer));
+
+            // Add a new GeoJSON layer with the selected style
+            $.getJSON('NZ_DHB2012.geojson', function (data) {
+                console.log(data)
+                geojsonLayer = L.geoJSON(data, {
+                    style: function (feature) {
+                        var match = filteredData.find(row => row.DHB == feature.properties.NAME);
+                        var color = match ? cmap(match.NumDisps) : '#ffffff';
+                        return { fillColor: color };
+                    }
+                }).addTo(map);
+            })
+        }
+
+        //ctrl+/ to comment out
+
+        // bind pop-up
+        // move filters absolute
+        // legend
 
 
     </script>
-    
+
 </body>
 
 </html>
