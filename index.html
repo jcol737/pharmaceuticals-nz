@@ -41,7 +41,8 @@
         body, #map {
                 width: 100%;
                 height: 100%;
-                margin: 0:autopadding: 0;
+                margin: 0;
+                autopadding: 0;
             }
     </style>
 
@@ -56,7 +57,51 @@
                     zoom: 6,
                     center: [-41, 172]
                 });
-        L.tileLayer.provider("Esri.WorldTerrain").addTo(map);
+
+        var baseMaps = {
+      "OSM": L.tileLayer.provider("OpenStreetMap.Mapnik"),
+      "OSM Grayscale": L.tileLayer.provider("OpenStreetMap.BlackAndWhite"),
+      "CartoDB Positron": L.tileLayer.provider('CartoDB.PositronNoLabels').addTo(map),
+      "CartoDB Dark Matter": L.tileLayer.provider("CartoDB.DarkMatter"),
+      "ESRI WorldImagery": L.tileLayer.provider("Esri.WorldImagery"),
+      "Google Hybrid": L.tileLayer('http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}', {
+        maxZoom: 20,
+        subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
+      }),
+      "Wikimedia": L.tileLayer.provider("Wikimedia")
+    }
+
+    map.createPane('labels');
+    map.getPane('labels').style.zIndex = 625;
+    map.getPane('labels').style.pointerEvents = 'none';
+    var labels = L.tileLayer.provider("Stamen.TonerLabels", {
+      pane: "labels",
+      interactive: false,
+      opacity: .8,
+    });
+
+    map.createPane('whitelabels');
+    map.getPane('whitelabels').style.zIndex = 625;
+    map.getPane('whitelabels').style.pointerEvents = 'none';
+    map.getPane('whitelabels').style.filter = 'invert(100%)';
+    var whitelabels = L.tileLayer.provider("Stamen.TonerLabels", {
+      pane: "whitelabels",
+      interactive: false,
+      opacity: .8,
+    });
+
+    var overlays = {
+      "City labels": labels,
+      "City labels (white)": whitelabels,
+    }
+
+    L.control.layers(baseMaps, overlays).addTo(map);
+
+    var scale = chroma.scale("BuPu").domain([0,100])
+    console.log(scale)
+
+    
+
     </script>
     
 </body>
