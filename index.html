@@ -25,7 +25,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"
         integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
     <script src='//api.tiles.mapbox.com/mapbox.js/plugins/leaflet-omnivore/v0.3.1/leaflet-omnivore.min.js'></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/chroma-js/2.0.3/chroma.min.js"></script>
 
     <script src='https://unpkg.com/@turf/turf@6/turf.min.js'></script>
 
@@ -60,7 +59,36 @@
             width: 100%;
             height: 100%;
             margin: 0;
-            autopadding: 0
+        }
+
+        .legend {
+            background-color: rgba(0,0,0,0.8);
+            line-height: 18px;
+            color: white;
+            width: 300px;
+            padding: 20px;
+            margin-top: 30px !important;
+            border-radius: 5px;
+        }
+
+        .legend i {
+            width: 18px;
+            height: 18px;
+            float: left;
+            margin-right: 8px;
+            opacity: 0.7;
+            clear: left;
+        }
+
+        .legend i.circle {
+            border-radius: 50%;
+        }
+
+        .legend-source {
+            font-size: 70%;
+            color: #999;
+            clear: both;
+            float: right;
         }
     </style>
 
@@ -138,6 +166,7 @@
         L.control.layers(baseMaps, overlays).addTo(map);
 
         // add typerhead or autocomplete so search option
+        // in css add absolute position to place the select boxes and give them a background too similar to the legend
 
         var typeControl = L.control({position: 'topright'});
         typeControl.onAdd = function(map) {
@@ -227,34 +256,176 @@
             console.log(filteredData)
 
             var NumDisps = filteredData.map(row => row.NumDisps)
+            console.log(NumDisps)
             var min = Math.min(...NumDisps)
             var max = Math.max(...NumDisps)
             console.log(min, max)
 
             // colours
-            var cmap = chroma.scale('Spectral').domain([min, max])
+            // ideally take the range of values in filteredData, calculate the quintile steps for 5 colour classes, and then generate the palette for these values
+
+            // generate the quintile values
+            function calculateQuintiles(data) {
+                data.sort((a, b) => a - b);
+                const quintiles = [];
+                for (let i = 1; i <= 5; i++) {
+                    const index = Math.round(i * 0.2 * data.length) - 1;
+                    quintiles.push(data[index]);
+                }
+                return quintiles;
+            }
+
+            const quintiles_NumDisps = calculateQuintiles(NumDisps);
+            console.log(quintiles_NumDisps)
+            //const sample = [309,615,675,799,907,922,1061,1472,1528,2092,2230,2269,2698,3049,3838,4479,4745,4818,6800,7039,52345];
+            //const sample_quin = calculateQuintiles(sample);
+            //console.log(sample_quin);
+
+            console.log(quintiles_NumDisps[0]);
+
+            //var cmap = chroma.scale('Spectral').domain([min, max]);
+            //console.log(cmap(1000));
+            var cmap = chroma.scale('OrRd').classes(5);
+
+            // Function to find the appropriate color for a value
+           //function getColor(value) {
+           //    for (var i = 0; i < quintiles_NumDisps.length; i++) {
+           //        if (value < quintiles_NumDisps[i]) {
+           //            return cmap.colors(quintiles_NumDisps.length)[i];
+           //        }
+           //    }
+           //    return cmap.colors(quintiles_NumDisps.length)[quintiles_NumDisps.length - 1];
+           //}
+
+            // Assign a color to each value
+            //var colors = filteredData.map(getColor);
+            //console.log(colors);
+
+            // Assign a color to each value
+            //const coloredData = filteredData.map(value => {
+            //    let quintile = 0;
+            //    for (let i = 0; i < quintiles_NumDisps.length; i++) {
+            //        if(value <= quintiles_NumDisps[i]) {
+            //            quintile = i;
+            //            break;
+            //        }
+            //    }
+//
+            //    const color = cmap(quintile/4).hex();
+//
+            //    return {value, color};
+            //});
+            //console.log(coloredData);
+
+            // get colors for each quintile
+            //var quintileColors = quintiles_NumDisps.map((value, index) => cmap(index + 1).hex());
+            //console.log(quintileColors);
 
             // Remove the old GeoJSON layer
             if (geojsonLayer) map.removeLayer(geojsonLayer)
             //if (map.removeLayer(geojsonLayer));
 
+            // Remove the old Legend
+            if (legend instanceof L.control) map.removeControl(legend)
+            // this is not working, fix this
+
             // Add a new GeoJSON layer with the selected style
             $.getJSON('NZ_DHB2012.geojson', function (data) {
                 console.log(data)
                 geojsonLayer = L.geoJSON(data, {
+                    onEachFeature: function(feature, layer) {
+                        // Renaming the DHB geojson names to match the csv
+                        var name = feature.properties.NAME;
+                        if (name == "Hutt") name = "Hutt Valley"
+                        if (name == "Midcentral") name = "MidCentral"
+                        if (name == "Capital and Coast") name = "Capital & Coast"
+                        //console.log(name);
+
+                        var match_p = filteredData.find(row => row.DHB == name);
+                        //console.log(match_p.Type);
+                        var p = feature.properties;
+                        //console.log(p);
+                        var desc = `DHB: <b>${p.NAME}</b><hr>
+                                    Type: ${match_p.Type}<br>
+                                    Grouping: ${match_p.TherapeuticGrp3}<br>
+                                    Year: ${match_p.YearDisp}<br>
+                                    NumDisps: ${match_p.NumDisps}<br>
+                                    NumPpl: ${match_p.NumPpl}`;
+                        layer.bindPopup(desc)
+                    },
                     style: function (feature) {
-                        var match = filteredData.find(row => row.DHB == feature.properties.NAME);
+                        var name = feature.properties.NAME;
+                        if (name == "Hutt") name = "Hutt Valley"
+                        if (name == "Midcentral") name = "MidCentral"
+                        if (name == "Capital and Coast") name = "Capital & Coast"
+                        //console.log(name);
+
+                        var match = filteredData.find(row => row.DHB == name);
+                        console.log(match);
+
+                        //var quintile = 0;
+                        //for (let i = 0; i < quintiles_NumDisps.length; i++) {
+                        //    if (match.NumDisps <= quintiles_NumDisps[i]) {
+                        //        quintile = i;
+                        //        break;
+                        //    }
+                        //}
+
+                        // Get the color for the quintile from the scale
+                        //var color = cmap(quintile / 4).hex();
+                        //console.log(color);
+
+                        // Apply the color to the DHB
+
+
                         var color = match ? cmap(match.NumDisps) : '#ffffff';
-                        return { fillColor: color };
+                        console.log(match.NumDisps);
+                        // not matching Midcentral, Capital and Coast, or Hutt
+                        return { 
+                            fillColor: color, 
+                            fillOpacity: .3,
+                            color: "black",
+                            weight: .5
+                        };
                     }
                 }).addTo(map);
             })
+
+            var legend = L.control({position: 'bottomright'})
+
+            legend.onAdd = function(map) {
+
+                var div = L.DomUtil.create('div', 'info legend'),
+                grades = [min, max],
+                labels = [];
+
+                // loop through the values and generate a label with a colored square for each interval
+                
+                var DHBLegend = "<div id='DHBLegend'><h4>NumDisps by DHB</h4>";
+                for (var i = 0; i < grades.length; i++) {
+                    DHBLegend +=
+                        '<i style="background:' + cmap(grades[i] + 1) + '"></i> ' + grades[i] + (grades[i + 1] ? '&ndash;' + grades[i + 1] + '<br>' : '+');
+                }
+
+                //div.innerHTML = `Legend`;
+
+                //var DHBLegend = "<div id='DHBLegend'><h4>NumDisps by DHB</h4>";
+                //for (var i of [min, max]) {
+                 //   DHBLegend += `i style="background: ${cmap(i)}"></i>${i}<br>`;
+                //}
+                div.innerHTML += DHBLegend + "</div>"
+                return div;
+            };
+
+            legend.addTo(map);
         }
+
+        
 
         //ctrl+/ to comment out
 
         // bind pop-up
-        // move filters absolute
+        // move filters absolute and wrap black border around them
         // legend
 
 
