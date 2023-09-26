@@ -95,7 +95,7 @@
 </head>
 
 <body>
-    <h1 id="title">Te Whatu Ora Pharmaceutical Data, Infections - Agents for Systemic Use, by DHB</h1>
+    <h1 id="title">Te Whatu Ora Pharmaceutical Data, TG3 groups for TG1 Infections - Agents for Systemic Use, by District Health Board</h1>
     <div id="map"></div>
 
     <!-- <div id="type-filter" style="display: none;">
@@ -195,8 +195,6 @@
             }
         }
 
-
-
         var csvData;
         Papa.parse('Te_Whatu_Ora_data/full_TG3_lookup_TG1_Infections_subset.csv', {
             download: true,
@@ -226,23 +224,6 @@
             }
         })
 
-
-        //$.getJSON('NZ_DHB2012.geojson', function(data) {
-        //    L.geoJSON(data, {
-        //        onEachFeature: function(feature, layer) {
-        //            var match = csvData.find(function(row) {
-        //                return row.DHB === feature.properties.DHB12;
-        //            });
-        //            if (match) {
-        //                feature.properties.csvData = match;
-        //            }
-        //        }
-        //    }).addTo(map); })
-
-        // or simply
-        //$.getJSON('NZ_DHB2012.geojson', function(data) {
-        //    L.geoJSON(data).addTo(map); })
-
         geojsonLayer = null
 
         function updateMap() {
@@ -261,31 +242,6 @@
             var min = Math.min(...NumDisps)
             var max = Math.max(...NumDisps)
             console.log(min, max)
-
-            // colours
-            // ideally take the range of values in filteredData, calculate the quintile steps for 5 colour classes, and then generate the palette for these values
-
-            // generate the quintile values
-            //function calculateQuintiles(data) {
-            //    data.sort((a, b) => a - b);
-            //    const quintiles = [];
-            //    for (let i = 1; i <= 5; i++) {
-            //        const index = Math.round(i * 0.2 * data.length) - 1;
-            //        quintiles.push(data[index]);
-            //    }
-            //    return quintiles;
-            //}
-
-            //const quintiles_NumDisps = calculateQuintiles(NumDisps);
-            //console.log(quintiles_NumDisps)
-            //const sample = [309,615,675,799,907,922,1061,1472,1528,2092,2230,2269,2698,3049,3838,4479,4745,4818,6800,7039,52345];
-            //const sample_quin = calculateQuintiles(sample);
-            //console.log(sample_quin);
-
-            //console.log(quintiles_NumDisps[0]);
-
-            //var cmap = chroma.scale('Spectral').domain([min, max]);
-            //console.log(cmap(1000));
             
             if (min == max) {
                 var breaks = [min]
@@ -299,10 +255,6 @@
             // Remove the old GeoJSON layer
             if (geojsonLayer) map.removeLayer(geojsonLayer)
             //if (map.removeLayer(geojsonLayer));
-
-            // Remove the old Legend
-            //if (legend instanceof L.control) map.removeControl(legend)
-            // this is not working, fix this
 
             // Add a new GeoJSON layer with the selected style
             $.getJSON('NZ_DHB2012.geojson', function (data) {
