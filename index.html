@@ -165,8 +165,7 @@
 
         L.control.layers(baseMaps, overlays).addTo(map);
 
-        // add typerhead or autocomplete so search option
-        // in css add absolute position to place the select boxes and give them a background too similar to the legend
+        // future work, add typerhead or autocomplete so search option
 
         // var typeControl = L.control({ position: 'topright' });
         // typeControl.onAdd = function (map) {
@@ -308,10 +307,6 @@
             //$('#DHBLegend').empty()
             var DHBLegend = "<h4>NumDisps by DHB</h4>"
             var range = [min, max]
-            // for (var i = 0; i < range.length; i++) {
-            //         DHBLegend +=
-            //             '<i style="background:' + cmap(range[i] + 1) + '"></i> ' + range[i] + (range[i + 1] ? '&ndash;' + range[i + 1] + '<br>' : '+');
-            //     }
             console.log("breaks")
             console.log(breaks)
             for (var i of breaks) {
@@ -335,7 +330,7 @@
                 
                 div.innerHTML += "Type: <br>";
                 div.innerHTML += "<select id='type-select'></select><br>";
-                div.innerHTML += "TG3 ID: ";
+                div.innerHTML += "Therapeutic Group Level 3: ";
                 div.innerHTML += "<select id='grouping-select'></select>";
                 div.innerHTML += "Year: <br>";
                 div.innerHTML += "<select id='year-select'></select>";
@@ -359,11 +354,6 @@
             $('#year-select').change(updateMap)
 
         //ctrl+/ to comment out
-
-        // bind pop-up
-        // move filters absolute and wrap black border around them
-        // legend
-
 
     </script>
 
