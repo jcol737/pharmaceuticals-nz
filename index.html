@@ -1,7 +1,7 @@
 <html>
 
 <head>
-    <title>Te Whatu Ora Pharmaceutical Data, Infections - Agents for Systemic Use, by DHB</title>
+    <title>Te Whatu Ora Pharmaceutical Data, selected TG3 groups, by DHB</title>
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.8.0/leaflet.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.8.0/leaflet.js"></script>
@@ -95,7 +95,7 @@
 </head>
 
 <body>
-    <h1 id="title">Te Whatu Ora Pharmaceutical Data, TG3 groups for TG1 Infections - Agents for Systemic Use, by District Health Board</h1>
+    <h1 id="title">Te Whatu Ora Pharmaceutical Data, selected TG3 groups, by District Health Board</h1>
     <div id="map"></div>
 
     <!-- <div id="type-filter" style="display: none;">
@@ -195,7 +195,7 @@
         }
 
         var csvData;
-        Papa.parse('Te_Whatu_Ora_data/full_TG3_lookup_TG1_Infections_subset.csv', {
+        Papa.parse('Te_Whatu_Ora_data/full_TG3_subset_selected_groups.csv', {
             download: true,
             header: true,
             skipEmptyLines: true,
@@ -331,7 +331,7 @@
                 div.innerHTML += "Type: <br>";
                 div.innerHTML += "<select id='type-select'></select><br>";
                 div.innerHTML += "Therapeutic Group Level 3: ";
-                div.innerHTML += "<select id='grouping-select'></select>";
+                div.innerHTML += "<select id='grouping-select'></select><br>";
                 div.innerHTML += "Year: <br>";
                 div.innerHTML += "<select id='year-select'></select>";
 
