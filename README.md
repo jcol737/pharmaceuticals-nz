@@ -1,5 +1,5 @@
 # pharmaceuticals-nz
-A leaflet map of the TG3 Te Whatu Ora pharmaceutical data, subset to the TG1 'Infections - Agents for Systemic Use', by District Health Board. Proof of concept.
+A leaflet map of Te Whatu Ora pharmaceutical data, subset to selected TG3 groups, by District Health Board. Proof of concept.
 
 Te Whatu Ora data citation:
 Te Whatu Ora. 2023. Pharmaceutical Data web tool version 24 August 2023 (data extracted from the Pharmaceutical Collection on 08 June 2023). URL: https://tewhatuora.shinyapps.io/pharmaceutical-data-web-tool/ (Accessed 01/09/2023).
